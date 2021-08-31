@@ -39,3 +39,54 @@
   font-family: 'iconfont';
   margin-left: 10px;
 }
+
+.header {
+  position: relative;
+  height: 105px;
+  background-color: snow;
+}
+
+.logo {
+  position: absolute;
+  width: 175px;
+  height: 56px;
+  top: 25px;
+}
+
+.logo h1 {
+  height: 100%;
+}
+
+.logo a {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-image: url(http://www.ciscomfg.net/img/logo.png);
+  font-size: 0;
+}
+
+.search {
+  position: absolute;
+  top: 25px;
+  left: 346px;
+  width: 538px;
+  height: 36px;
+  border: 2px solid #b1191a;
+}
+
+.search input {
+  position: absolute;
+  width: 454px;
+  height: 32px;
+  padding-left: 15px;
+}
+
+.search button {
+  position: absolute;
+  width: 80px;
+  height: 32px;
+  right: 0px;
+  background-color: #b1191a;
+  color: white;
+  font-size: 16px;
+}
