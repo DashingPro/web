@@ -13,27 +13,190 @@
       box-sizing: border-box;
     }
 
-    div {
-      display: inline-block;
-      background-color: red;
-      border: 5px solid blue;
+    .carousel_box {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      overflow: hidden;
     }
 
-    div::before {
-      content: 'before';
-      color: rebeccapurple;
+    .carousel_box ol {
+      display: flex;
+      position: absolute;
+      bottom: 5px;
+      right: 15px;
+      height: 10px;
+      list-style: none;
+      flex-flow: row nowrap;
+      align-items: center;
+      justify-content: end;
+      padding: 0px 5px;
     }
 
-    /* 会层叠 */
-    div::before {
-      content: 'before222222';
-      color: blue;
+    .carousel_box ol li {
+      display: flex;
+      width: 5px;
+      height: 5px;
+      border-radius: 2px;
+      background-color: white;
+      list-style: none;
+      margin: 0px 2px;
+      transition: width 0s cubic-bezier(0, 1, .5, .9);
+    }
+
+    .carousel_box ul {
+      display: flex;
+      position: absolute;
+      flex-flow: row nowrap;
+      height: 100%;
+      transition: left 0s cubic-bezier(0, 1, .5, .9);
+    }
+
+    .carousel_box ul li {
+      list-style: none;
+      height: 100%;
     }
   </style>
 </head>
 
 <body>
-  <div>我的宝贝</div>
+  <div class="carousel_box">
+    <ul></ul>
+    <ol></ol>
+  </div>
+
+  <video preload="auto" src="https://p3.shimolife.com/obj/homed-fe-src/design-competition-video.mp4" width="390"
+    height="218.4" crossorigin="anonymous" controls playsinline></video>
+
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const div = document.querySelector('body .carousel_box');
+      const pic_width = div.offsetWidth;
+      let showingIndex = 0;
+      const image_srcs = [
+        'https://imgs.qunarzz.com/p/p48/201302/28/bc44faa497db0dcf93835fbb.jpg_256x160_0ba13461.jpg',
+        'https://imgs.qunarzz.com/p/p67/1512/a2/0ebfcd965b9391f7.jpg_256x160_04d5813d.jpg',
+        'https://imgs.qunarzz.com/p/p70/1809/e7/4941057a6aae702.jpg_256x160_9fee6ccb.jpg',
+        'https://imgs.qunarzz.com/vs_ceph_b2c_001/ffeb9f29-e7e7-4626-8087-ad48c57c4f76.jpg_r_480x320x95_63377b6c.jpg'
+      ]
+
+      const ul = document.querySelector('body .carousel_box ul')
+      for (let i = 0; i < image_srcs.length; i++) {
+        let pic = document.createElement('li');
+        pic.style.width = pic_width + 'px';
+        let img = document.createElement('img');
+        img.src = image_srcs[i];
+        img.title = '第' + i + '张图片';
+        img.alt = img.title;
+        img.style.width = '100%';
+        img.style.height = '100%';
+        pic.appendChild(img);
+        ul.appendChild(pic);
+      }
+
+      // 插入第一个与最后一个
+      (() => {
+        const all_li = ul.querySelectorAll('li');
+        if (all_li.length) {
+          let first_copy = all_li[0].cloneNode(true);
+          let last_copy = all_li[all_li.length - 1].cloneNode(true);
+          ul.insertBefore(last_copy, all_li[0]);
+          ul.appendChild(first_copy);
+        }
+      })();
+
+      const ol = document.querySelector('body .carousel_box ol')
+      for (let i = 0; i < image_srcs.length; i++) {
+        let dot = document.createElement('li');
+        ol.appendChild(dot);
+      }
+
+      fixCurrentPicIndex(0, showingIndex);
+
+      function fixCurrentPicIndex(current, target, duration = 0) {
+        ul.style.transitionDuration = duration + 's';
+        let left = (-target - 1) * pic_width;
+        ul.style.left = left + 'px';
+        fixIndicator(current, target, current == target ? 0 : 1, duration);
+      }
+
+      // 更新指示器 当前正在选中的 将要过渡到的目标 进度是多少？
+      function fixIndicator(current, target, progress, duration = 0) {
+        const lis = ol.querySelectorAll('li');
+        for (let i = 0; i < lis.length; i++) {
+          const li = lis[i];
+          const w = (() => {
+            if (i == ((current + lis.length) % lis.length)) {
+              return (20 + (5 - 20) * progress) + 'px';
+            } else if (i == ((target + lis.length) % lis.length)) {
+              return (5 + (20 - 5) * progress) + 'px';
+            } else {
+              return '5px';
+            }
+          })();
+          li.style.transitionDuration = duration + 's';
+          li.style.width = w;
+        }
+      }
+
+      let timer = null;
+
+      function startCarousel() {
+        stopCarousel();
+        timer = setInterval((e) => {
+          fixCurrentPicIndex(showingIndex, ++showingIndex, 0.3);
+        }, 3000);
+      }
+      startCarousel();
+
+      ul.addEventListener('transitionend', (arg) => {
+        if (showingIndex >= image_srcs.length) {
+          showingIndex = 0;
+          fixCurrentPicIndex(showingIndex, showingIndex);
+        }
+      });
+
+      function stopCarousel() {
+        clearInterval(timer);
+        timer = null;
+      }
+
+      let finger_start_x = 0;
+      div.addEventListener('touchstart', touch => {
+        finger_start_x = touch.pageX;
+        touch.preventDefault();
+        stopCarousel();
+      });
+
+      div.addEventListener('touchmove', touch => {
+        const off_x = touch.pageX - finger_start_x;
+        const start_left = (-showingIndex - 1) * pic_width;
+        ul.style.left = start_left + off_x + 'px';
+        const fanxiang = -off_x / Math.abs(off_x);
+        const progress = Math.abs(off_x) / pic_width;
+        fixIndicator(showingIndex, showingIndex + fanxiang, progress);
+        touch.preventDefault();
+      });
+
+      div.addEventListener('touchend', touch => {
+        const off_x = touch.pageX - finger_start_x;
+        const start_left = (-showingIndex - 1) * pic_width;
+        ul.style.left = start_left + off_x + 'px';
+
+        const fanxiang = (Math.abs(off_x) < 80 ? 0 : -off_x) / Math.abs(off_x);
+        const duration = (() => {
+          if (fanxiang == 0) {
+            return Math.abs(off_x) / pic_width
+          } else {
+            return (pic_width - Math.abs(off_x)) / pic_width
+          }
+        })();
+        fixCurrentPicIndex(showingIndex, showingIndex += fanxiang, duration * 0.3);
+        touch.preventDefault();
+        startCarousel();
+      });
+    });
+  </script>
 </body>
 
 </html>
