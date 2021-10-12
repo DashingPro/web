@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+  <title>试试选择器</title>
+
+  <style>
+    .a.b {
+      background-color: red;
+    }
+
+    .box {
+      display: inline-block;
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      box-sizing: border-box;
+      text-align: center;
+      line-height: 100px;
+      background-color: rgba(0.1, 0.1, 0.1, 0.1);
+    }
+
+    .a.b~.a.b.c {
+      background-color: green;
+    }
+
+    .a.b~.b {
+      background-color: yellow;
+    }
+
+    .a.b+.a {
+      background-color: gold;
+    }
+
+    .a.b+.a.b {
+      background-color: purple;
+    }
+
+    div>p#a {
+      color: green;
+    }
+
+    div::first-line {
+      color: blue;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>复合选择器</h1>
+  <div class="box a">a</div>
+  <div class="box b">b</div>
+  <div class="box a b">a&b</div>
+  <div class="box a">a</div>
+  <div class="box b">b</div>
+  <div class="box a b c">a&b&c</div>
+
+  <p>选择器优先级使用一个三元组(a, b, c)来构成一个复杂选择器的优先级。</p>
+  <ul>
+    <li>id选择器的数目标记为a</li>
+    <li>伪类和class选择器的数目标记为b</li>
+    <li>伪元素和标签选择器的数目标记为c</li>
+    <li>*不影响优先级</li>
+    <li>同一优先级采用'后面的覆盖前面的'原则</li>
+    <li>选择器列表(,选择器)并不会导致优先级叠加</li>
+    <li>留了一个口子 !important 最高优先级</li>
+  </ul>
+
+  <p>CSS规定，first-line 必须出现在最内层的会计元素之内。</p>
+
+  <div>
+    <p id="a">First paragraph<br>黑恶hi额hi</p>
+    <p>Second paragraph</p>
+  </div>
+</body>
+
+</html>
